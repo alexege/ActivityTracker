@@ -81,3 +81,22 @@ body {
   right: 2rem;
   top: 1rem;
 }
+
+.title {
+  text-align: center;
+}
+
+.nav-item {
+  display: inline-block;
+}
+
+.navbar {
+  border-bottom: 1px solid black;
+  margin-bottom : 10px;
+}
+
+.join {
+  position: absolute;
+  right: 400px;
+  top: 6rem;
+}

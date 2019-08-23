@@ -1,0 +1,29 @@
+@model Activity
+
+<div class="navbar">
+    <a class="logout" asp-action="Logout">Logout</a>
+    <h1 class="nav-item">Dojo Activity Center</h1>
+    <h4 class="nav-item">Welcome, @ViewBag.FirstName</h4>
+    <br>
+</div>
+
+<a class="join" asp-action="Dashboard">Dashboard</a>
+<!-- <a class="join" asp-action="joinAction"><button>Join</button></a> -->
+
+
+
+<h2>@Model.Title</h2>
+<h5>Event Coordinator:</h5><h6>@Model.Coordinator.FirstName</h6>
+<h5>Description:</h5><p>@Model.Description</p>
+<!-- <h5>Date:@Model.Date</h5>
+<h5>Time:@Model.Time</h5>
+<h5>Duration:@Model.Duration</h5> -->
+<h5>Participants:</h5>
+
+
+<ul>
+    @foreach(var part in Model.Participants)
+    {
+        <li>@part.User.FirstName</li>
+    }
+</ul>

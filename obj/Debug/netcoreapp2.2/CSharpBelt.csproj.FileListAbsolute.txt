@@ -31,3 +31,6 @@ C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.
 C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\LoginPartial.g.cshtml.cs
 C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\RegisterPartial.g.cshtml.cs
 C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\Dashboard.g.cshtml.cs
+C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\NewActivity.g.cshtml.cs
+C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\ShowActivity.g.cshtml.cs
+C:\Users\alexe\Documents\CodingDojo\CSharp\MVC\CSharpBelt\obj\Debug\netcoreapp2.2\Razor\Views\Home\DisplayActivity.g.cshtml.cs

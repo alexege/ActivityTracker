@@ -26,10 +26,12 @@ namespace CSharpBelt
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; }
-
+        
         [Required]
         [DataType(DataType.Password)]
         [MinLength(8, ErrorMessage="Password must be as least 8 characters long.")]
+        [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[@#$%!]).+$", ErrorMessage="Password must contain at least 1 number, 1 letter, and 1 special character")]
+        // [RegularExpression(@"(?=.*\d)(?=.*[a-z])(?=.*[^\da-zA-Z])$", ErrorMessage="Password must contain at least 1 number, 1 letter, and 1 special character")]
         public string Password { get; set; }
         [Required]
         [Compare("Password")]
