@@ -12,10 +12,12 @@ namespace CSharpBelt
         public int ActivityId { get; set; }
         [Required(ErrorMessage="Title is required.")]
         public string Title { get; set; }
+
         [Required]
         [CheckIfFuture]
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
+
         [DataType(DataType.Time)]
         public DateTime Time { get; set; }
         public int Duration { get; set; }
@@ -43,18 +45,6 @@ namespace CSharpBelt
             return ValidationResult.Success;
         }
     }
-
-    // public class CheckIfPast : ValidationAttribute
-    // {
-    //     protected override ValidationResult IsValid(object date, ValidationContext validationContext){
-    //     DateTime day = Convert.ToDateTime(date);
-    //     DateTime now  =  DateTime.Now;
-    //     if(day>now){
-    //         return new ValidationResult("Activity cannot occur in the past. Please select a future date.");
-    //     }else{
-    //         return ValidationResult.Success;
-    //     }
-    // }
 
     }
 }

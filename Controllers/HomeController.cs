@@ -30,27 +30,33 @@ namespace CSharpBelt.Controllers
         [HttpPost("Login")]
         public IActionResult Login(LogUser logUser)
         {
+            // Look to see if user exists in database
             var found_user = dbContext.Users.FirstOrDefault(user => user.Email == logUser.LogEmail);
 
+            // If no user found via that email address, display error and redirect back to index page.
             if(found_user == null)
             {
                 ModelState.AddModelError("LogEmail", "Incorrect Email or Password");
                 return View("Index");
             }
 
+            //If a user is found, Verify their password to the hashed password stored in the database.
             PasswordHasher<LogUser> Hasher = new PasswordHasher<LogUser>();
             var user_verified = Hasher.VerifyHashedPassword(logUser, found_user.Password, logUser.LogPassword);
 
+            //If VerifyHashedPassword returns a 0, Passwords didn't match. Return user to Index.
             if(user_verified == 0)
             {
-                ModelState.AddModelError("LogEmail", "Email already in use. Please use a new one");
+                ModelState.AddModelError("LogEmail", "Incorrect Email or Password");
                 return View("Index");
             }
 
-            // var current_user = dbContext.Users.Last().UserId;
+            //Store logged in user's id into session.
+            HttpContext.Session.SetInt32("UserId", found_user.UserId);
 
-            HttpContext.Session.SetInt32("UserId", dbContext.Users.Last().UserId);
-            ViewBag.Logged_in_user_id = HttpContext.Session.GetInt32("UserId");
+            //Store logged in user's id into ViewBag.
+            ViewBag.Logged_in_user_id = found_user.UserId;
+
             return RedirectToAction("Dashboard");
         }
 
@@ -58,16 +64,20 @@ namespace CSharpBelt.Controllers
         [HttpPost("Register")]
         public IActionResult Register(User newUser)
         {
+            //If ModelState contains no errors
             if(ModelState.IsValid)
             {
+                //Check to see if email address already exists in database
                 bool notUnique = dbContext.Users.Any(a => a.Email == newUser.Email);
 
+                //If email already taken,display error and redirect to index.
                 if(notUnique)
                 {
-                    ModelState.AddModelError("Email", "Email already in use. Please use a new one");
+                    ModelState.AddModelError("Email", "Email already in use. Please use a new one.");
                     return View("Index");
                 }
 
+                //If unique password, hash the new user's password
                 PasswordHasher<User> hasher = new PasswordHasher<User>();
                 string hash = hasher.HashPassword(newUser, newUser.Password);
                 newUser.Password = hash;
@@ -75,6 +85,7 @@ namespace CSharpBelt.Controllers
                 dbContext.Users.Add(newUser);
                 dbContext.SaveChanges();
 
+                //Store new user's id into session
                 var last_added_User = dbContext.Users.Last().UserId;
                 HttpContext.Session.SetInt32("UserId", last_added_User);
             
@@ -87,118 +98,130 @@ namespace CSharpBelt.Controllers
         [HttpGet("Dashboard")]
         public IActionResult Dashboard()
         {
-            // checked to see if user is in session or not. If not, redirec to index.
+            //Checked to see if user is in session or not. If not, redirec to index.
             if(HttpContext.Session.GetInt32("UserId") == null){
                 return View("Index");
             }
 
-
+            //Get user id from session
             int? UserId = HttpContext.Session.GetInt32("UserId");
+
+            //If no user in session, redirect to index
             if(UserId == null)
             {
                 return View("Index");
             }
 
+            //Place current logged in user's name in Viewbag.FirstName
             var current_user = dbContext.Users.First(usr => usr.UserId == UserId);
             ViewBag.FirstName = current_user.FirstName;
 
+            //Place current logged in user's id in Viewbag.Logged_in_user_id
             ViewBag.Logged_in_user_id = HttpContext.Session.GetInt32("UserId");
 
+            //Get a list of activities meeting the following criteria
             var activities = dbContext.Activities
                             .Include(a => a.Participants)
                             .Include(a => a.Coordinator)
                             .OrderByDescending(d => d.Date)
-                            .Where(a =>a.Date > DateTime.Now)
+                            .Where(a =>a.Date >= DateTime.Now)
+                            .Where(t => t.Time >= DateTime.Now)
                             .ToList();
 
+            //Render the Dashboard view and push the list of activities
             return View("Dashboard", activities);
         }
 
-        //================================== Activities and Misc ==================================
+        //Render NewActivity page
         [HttpGet("activity/new")]
         public IActionResult NewActivity()
         {
             return View();
         }
-        
+
+        //Create a new Activity
         [HttpPost("activity/new")]
         public IActionResult createActivity(Activity newActivity)
         {
             if(ModelState.IsValid)
             {
-                //Create a new Activity
+                //Grab current user id from session
                 var current_user = HttpContext.Session.GetInt32("UserId");
                 User Coordinator = dbContext.Users.FirstOrDefault(u => u.UserId == current_user);
-                // newActivity.Coordinator = dbContext.Users.FirstOrDefault(u => u.UserId == current_user);
                 newActivity.Coordinator = Coordinator;
-                // newActivity.Coordinator = dbContext.Users.Where(usr => usr.UserId == HttpContext.Session.GetInt32("UserId"));
                 dbContext.Activities.Add(newActivity);
                 dbContext.SaveChanges();
 
-                var last_added_activity = dbContext.Activities.Last();
-                var last_added_activity_id = last_added_activity.ActivityId;
+                //Store last added activity id in session
+                var last_added_activity_id = dbContext.Activities.Last().ActivityId;
                 HttpContext.Session.SetInt32("ActivityId", last_added_activity_id);
 
-                HttpContext.Session.SetInt32("Logged_in_user_id", (int)HttpContext.Session.GetInt32("UserId"));
-
-                var activityId = HttpContext.Session.GetInt32("ActivityId");
-
-                Activity current_activity = dbContext.Activities.FirstOrDefault(a => a.ActivityId == activityId);
-
-                var current_user_id = HttpContext.Session.GetInt32("UserId");
-                var current_usr = dbContext.Users.FirstOrDefault(usr => usr.UserId == current_user_id);
-                ViewBag.FirstName = current_usr.FirstName;
-
-                return View("ShowActivity", current_activity);
-                // return View("Index");
+                //Redirect to ShowActivity passing the new ActivityId
+                return RedirectToAction("ShowActivity", new { ActivityId = newActivity.ActivityId});
             }
             return View("NewActivity");
         }
 
-        // Join an Activity
+        //Join an Activity
         [HttpGet("participate/{ActivityId}")]
         public IActionResult JoinActivity(int ActivityId)
         {
+            //Grab UserId from session
             var user_in_session = (int)HttpContext.Session.GetInt32("UserId");
-            Participant newParticipant = new Participant(ActivityId, user_in_session);
-            var part = dbContext.Activities.FirstOrDefault(activity => activity.ActivityId == newParticipant.ActivityId);
 
+            //Add current logged in user to list of participants for specified activity
+            Participant newParticipant = new Participant(ActivityId, user_in_session);
+            Activity activity = dbContext.Activities.FirstOrDefault(act => act.ActivityId == newParticipant.ActivityId);
+
+            //Add the new participant
             dbContext.Participants.Add(newParticipant);
             dbContext.SaveChanges();
 
+            //Add last added participant to the Participants list
             var last_added_participant = dbContext.Participants.Last();
-            part.Participants.Add(last_added_participant);
+            activity.Participants.Add(last_added_participant);
             dbContext.SaveChanges();
 
             return RedirectToAction("Dashboard");
         }
         
-        // Leave an Activity
+        //Leave an Activity
         [HttpGet("participate/{ActivityId}/leave")]
         public IActionResult LeaveActivity(int ActivityId)
         {
+            //Grab a list of participants for specific Activity
             var activity_participants = dbContext.Participants.Where(part => part.ActivityId == ActivityId).ToList();
 
+            //Grab current logged in UserId
             var user_in_session = HttpContext.Session.GetInt32("UserId");
 
-            var leaving_participant = activity_participants.FirstOrDefault(leave => leave.UserId == user_in_session);
+            //Get participant that is leaving
+            Participant leaving_participant = activity_participants.FirstOrDefault(leave => leave.UserId == user_in_session);
+
+            //Remove participant from list of participants
             dbContext.Participants.Remove(leaving_participant);
             dbContext.SaveChanges();
+
             return RedirectToAction("Dashboard");
         }
 
-        // Delete an Activity
+        //Delete an Activity
         [HttpGet("participate/{ActivityId}/delete")]
         public IActionResult DeleteActivity(int ActivityId)
         {
-            var activity = dbContext.Activities.Include(act => act.Participants)
-                                                .FirstOrDefault(act => act.ActivityId == ActivityId);
+            //Get Activity matching passed in ActivityId
+            Activity activity = dbContext.Activities.Include(act => act.Participants).FirstOrDefault(act => act.ActivityId == ActivityId);
 
+            //Get list of participants from the activity
             var list_of_participants = activity.Participants.ToList();
+
+            //Remove each participant from the list of participants
             foreach(var part in list_of_participants)
             {
                 dbContext.Participants.Remove(part);
             }
+
+            //Delete the Activity from the list of activities
             dbContext.Activities.Remove(activity);
             dbContext.SaveChanges();
 
@@ -208,28 +231,23 @@ namespace CSharpBelt.Controllers
         [HttpGet("activity/{ActivityId}")]
         public IActionResult ShowActivity(int ActivityId)
         {
+           //Get the activity including Coordinator/Participants/Users that matches the ActivityId passed in 
+           Activity activities = dbContext.Activities.Include(act => act.Coordinator)
+                                                .Include(act => act.Participants)
+                                                    .ThenInclude(u => u.User)
+                                                .FirstOrDefault(a => a.ActivityId == ActivityId);
 
-            // var current_user_id = HttpContext.Session.GetInt32("UserId");
-            // var current_user = dbContext.Users.FirstOrDefault(usr => usr.UserId == current_user_id);
-            // ViewBag.FirstName = current_user.FirstName;
+            //Store logged in user's id in ViewBag
+            ViewBag.Logged_in_user_id = HttpContext.Session.GetInt32("UserId");
 
+            //Grab user object that matches logged in user's id from session
+            User logged_in_user = dbContext.Users.FirstOrDefault(user => user.UserId == HttpContext.Session.GetInt32("UserId"));
 
-            // var last_added_activity = HttpContext.Session.GetInt32("ActivityId");
-            // int id = ActivityId;
-            // var activity = dbContext.Activities.FirstOrDefault(a => a.ActivityId == last_added_activity);
+            //Store that user in ViewBag
+            ViewBag.Logged_in_user = logged_in_user;
 
-            // var activities = dbContext.Activities.Include(act => act.Coordinator)
-            //                                     .Include(act => act.Participants)
-            //                                         .ThenInclude(u => u.User)
-            //                                     .FirstOrDefault(a => a.ActivityId == ActivityId);
-
-            // return View(activity);
-
-            Activity current_activity = dbContext.Activities.FirstOrDefault(a => a.ActivityId == ActivityId);
-            ViewBag.current_activity = current_activity;
-            return View();
+            return View(activities);
         }
-
 
         //Log a user out of session
         [HttpGet("Logout")]

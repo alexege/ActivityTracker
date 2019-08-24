@@ -3,13 +3,32 @@
     <h2>Login</h2>
     <div class="align-left">
     <form asp-action="Login" controller="Home" method="post">
-        <label asp-for="LogEmail"></label><br>
-        <span class="error" asp-validation-for="LogEmail"></span>
-        <input class="form-control" name="LogEmail" type="email">
-        <label asp-for="LogPassword"></label><br>
-        <span class="error" asp-validation-for="LogPassword"></span>
-        <input class="form-control" name="LogPassword" type="password">
-        <button>Login</button>
+        <table>
+            <tr>
+                <td>
+                    <label asp-for="LogEmail"></label><br>
+                </td>
+                <td>
+                    <span class="error" asp-validation-for="LogEmail"></span>
+                    <input class="form-control" name="LogEmail" type="email">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="LogPassword"></label><br>
+                </td>
+                <td>
+                    <span class="error" asp-validation-for="LogPassword"></span>
+                    <input class="form-control" name="LogPassword" type="password">
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="text-align: right;">
+                    <button>Login</button>
+                </td>
+            </tr>
+        </table>
     </form>
     </div>
 </div>

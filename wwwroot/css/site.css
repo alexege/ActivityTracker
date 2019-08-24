@@ -74,6 +74,8 @@ body {
 
 .align-left {
   text-align: left;
+  border: 2px solid black;
+  padding: 15px;
 }
 
 .logout {

@@ -3,14 +3,23 @@
 <div class="navbar">
     <a class="logout" asp-action="Logout">Logout</a>
     <h1 class="nav-item">Dojo Activity Center</h1>
-    <h4 class="nav-item">Welcome, @ViewBag.FirstName</h4>
+    <h4 class="nav-item">Welcome, @ViewBag.Logged_in_user.FirstName</h4>
     <br>
 </div>
 
 <a class="join" asp-action="Dashboard">Dashboard</a>
-<!-- <a class="join" asp-action="joinAction"><button>Join</button></a> -->
 
-
+@if(Model.Coordinator.UserId == ViewBag.Logged_in_user_id)
+{
+    <a asp-action="DeleteActivity" asp-route-ActivityId="@Model.ActivityId">Delete</a>
+} else {
+    @if(Model.Participants.FirstOrDefault(a => a.UserId == ViewBag.Logged_in_user.UserId) == null)
+    {
+        <a asp-action="JoinActivity" asp-route-ActivityId="@Model.ActivityId"><button>Join</button></a>
+    } else {
+        <a asp-action="LeaveActivity" asp-route-ActivityId="@Model.ActivityId"><button>Leave</button></a>
+    }
+}
 
 <h2>@Model.Title</h2>
 <h5>Event Coordinator:</h5><h6>@Model.Coordinator.FirstName</h6>

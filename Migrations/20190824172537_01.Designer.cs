@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpBelt.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20190823185522_01")]
+    [Migration("20190824172537_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
