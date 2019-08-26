@@ -237,9 +237,6 @@ namespace CSharpBelt.Controllers
                                                     .ThenInclude(u => u.User)
                                                 .FirstOrDefault(a => a.ActivityId == ActivityId);
 
-            //Store logged in user's id in ViewBag
-            ViewBag.Logged_in_user_id = HttpContext.Session.GetInt32("UserId");
-
             //Grab user object that matches logged in user's id from session
             User logged_in_user = dbContext.Users.FirstOrDefault(user => user.UserId == HttpContext.Session.GetInt32("UserId"));
 

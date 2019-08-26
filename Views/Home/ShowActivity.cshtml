@@ -9,7 +9,7 @@
 
 <a class="join" asp-action="Dashboard">Dashboard</a>
 
-@if(Model.Coordinator.UserId == ViewBag.Logged_in_user_id)
+@if(Model.Coordinator.UserId == ViewBag.Logged_in_user.UserId)
 {
     <a asp-action="DeleteActivity" asp-route-ActivityId="@Model.ActivityId">Delete</a>
 } else {
