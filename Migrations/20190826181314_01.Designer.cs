@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CSharpBelt.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20190824172537_01")]
+    [Migration("20190826181314_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,8 +23,6 @@ namespace CSharpBelt.Migrations
                 {
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("CoordinatorUserId");
 
                     b.Property<DateTime>("Date");
 
@@ -40,9 +38,11 @@ namespace CSharpBelt.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
+                    b.Property<int>("UserId");
+
                     b.HasKey("ActivityId");
 
-                    b.HasIndex("CoordinatorUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Activities");
                 });
@@ -99,7 +99,8 @@ namespace CSharpBelt.Migrations
                 {
                     b.HasOne("CSharpBelt.User", "Coordinator")
                         .WithMany()
-                        .HasForeignKey("CoordinatorUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CSharpBelt.Models.Participant", b =>

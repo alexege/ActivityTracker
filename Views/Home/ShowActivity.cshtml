@@ -8,6 +8,7 @@
 </div>
 
 <a class="join" asp-action="Dashboard">Dashboard</a>
+<a class="edit" asp-action="Edit" asp-route-ActivityId="@Model.ActivityId">Edit</a>
 
 @if(Model.Coordinator.UserId == ViewBag.Logged_in_user.UserId)
 {

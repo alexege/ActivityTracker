@@ -25,6 +25,7 @@ namespace CSharpBelt
 
         public string DurationMeasure { get; set; }
         public string Description { get; set; }
+        public int UserId {get;set;}
         public User Coordinator { get; set; }
 
         public List<Participant> Participants { get; set; }

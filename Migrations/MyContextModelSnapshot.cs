@@ -22,8 +22,6 @@ namespace CSharpBelt.Migrations
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("CoordinatorUserId");
-
                     b.Property<DateTime>("Date");
 
                     b.Property<string>("Description");
@@ -38,9 +36,11 @@ namespace CSharpBelt.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
+                    b.Property<int>("UserId");
+
                     b.HasKey("ActivityId");
 
-                    b.HasIndex("CoordinatorUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Activities");
                 });
@@ -97,7 +97,8 @@ namespace CSharpBelt.Migrations
                 {
                     b.HasOne("CSharpBelt.User", "Coordinator")
                         .WithMany()
-                        .HasForeignKey("CoordinatorUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CSharpBelt.Models.Participant", b =>

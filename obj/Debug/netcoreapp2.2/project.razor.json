@@ -3016,6 +3016,11 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "Views\\Home\\Edit.cshtml",
+      "TargetPath": "Views\\Home\\Edit.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "Views\\Home\\NewActivity.cshtml",
       "TargetPath": "Views\\Home\\NewActivity.cshtml",
       "FileKind": "mvc"

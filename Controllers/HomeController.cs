@@ -124,8 +124,8 @@ namespace CSharpBelt.Controllers
                             .Include(a => a.Participants)
                             .Include(a => a.Coordinator)
                             .OrderByDescending(d => d.Date)
-                            .Where(a =>a.Date >= DateTime.Now)
-                            .Where(t => t.Time >= DateTime.Now)
+                            // .Where(a =>a.Date >= DateTime.Now)
+                            // .Where(t => t.Time >= DateTime.Now)
                             .ToList();
 
             //Render the Dashboard view and push the list of activities
@@ -148,7 +148,8 @@ namespace CSharpBelt.Controllers
                 //Grab current user id from session
                 var current_user = HttpContext.Session.GetInt32("UserId");
                 User Coordinator = dbContext.Users.FirstOrDefault(u => u.UserId == current_user);
-                newActivity.Coordinator = Coordinator;
+
+                newActivity.UserId = (int)current_user;
                 dbContext.Activities.Add(newActivity);
                 dbContext.SaveChanges();
 
@@ -171,15 +172,9 @@ namespace CSharpBelt.Controllers
 
             //Add current logged in user to list of participants for specified activity
             Participant newParticipant = new Participant(ActivityId, user_in_session);
-            Activity activity = dbContext.Activities.FirstOrDefault(act => act.ActivityId == newParticipant.ActivityId);
 
             //Add the new participant
             dbContext.Participants.Add(newParticipant);
-            dbContext.SaveChanges();
-
-            //Add last added participant to the Participants list
-            var last_added_participant = dbContext.Participants.Last();
-            activity.Participants.Add(last_added_participant);
             dbContext.SaveChanges();
 
             return RedirectToAction("Dashboard");
@@ -244,6 +239,50 @@ namespace CSharpBelt.Controllers
             ViewBag.Logged_in_user = logged_in_user;
 
             return View(activities);
+        }
+
+        //Edit/Update an activity
+        [HttpGet("Edit/{ActivityId}")]
+        public IActionResult Edit(int ActivityId)
+        {
+            //Get the activity including Coordinator/Participants/Users that matches the ActivityId passed in 
+            Activity activity = dbContext.Activities.Include(act => act.Coordinator)
+                                                .Include(act => act.Participants)
+                                                    .ThenInclude(u => u.User)
+                                                .FirstOrDefault(a => a.ActivityId == ActivityId);
+
+            return View(activity);
+        }
+
+        //Update an activity
+        [HttpPost("Update/{ActivityId}")]
+        public IActionResult Update(Activity edit_activity, int activityId)
+        {
+            if(ModelState.IsValid){
+            //Get the activity including Coordinator/Participants/Users that matches the ActivityId passed in 
+            Activity activity = dbContext.Activities.Include(act => act.Coordinator)
+                                                .Include(act => act.Participants)
+                                                    .ThenInclude(u => u.User)
+                                                .FirstOrDefault(a => a.ActivityId == activityId);
+
+            // Activity activity = dbContext.Activities.FirstOrDefault(a => a.ActivityId == activityId);
+
+            activity.Title = edit_activity.Title;
+            activity.Date = edit_activity.Date;
+            activity.Time = edit_activity.Time;
+            activity.Duration = edit_activity.Duration;
+            // activity.DurationMeasure = edit_activity.DurationMeasure;
+            activity.Description = edit_activity.Description;
+            // activity.Coordinator = edit_activity.Coordinator;
+            dbContext.SaveChanges();
+
+            return RedirectToAction("Dashboard");
+            }
+
+            Activity activ = dbContext.Activities.FirstOrDefault(a => a.ActivityId == activityId);
+
+            return View("Edit", activ);
+
         }
 
         //Log a user out of session

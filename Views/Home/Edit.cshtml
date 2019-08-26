@@ -1,0 +1,35 @@
+@model Activity
+
+<h1>Edit Activity</h1>
+<form asp-action="Update" asp-route-ActivityId="@Model.ActivityId" controller="Home" method="POST">
+    <label asp-for="Title"></label><br>
+    <span class="error" asp-validation-for="Title"></span>
+    <input class="form-control" asp-for="Title" type="text">
+
+    <label asp-for="Date"></label><br>
+    <span class="error" asp-validation-for="Date"></span>
+    <input class="form-control" asp-for="Date" type="Date">
+
+     <div class="form-group">
+        <label asp-for="Time">Time:</label><br>
+        <span class="error" asp-validation-for="Time"></span>
+        <input class="form-control" asp-for="Time">
+    </div>
+
+    <label asp-for="Duration">Duration:</label><br>
+    <span class="error" asp-validation-for="Duration"></span>
+    <input class="form-control" asp-for="Duration">
+    
+    <select asp-for="DurationMeasure">
+        <option value="Hours">Hours</option>
+        <option value="Minutes">Minutes</option>
+        <option value="Days">Days</option>
+    </select>
+
+    <br>
+    <label asp-for="Description"></label><br>
+    <span class="error" asp-validation-for="Description"></span><br>
+    <textarea asp-for="Description" cols="80" rows="10"></textarea>
+    <br>
+    <button>Update</button>
+</form>

@@ -102,3 +102,9 @@ body {
   right: 400px;
   top: 6rem;
 }
+
+.edit {
+  position: absolute;
+  right: 350px;
+  top: 6rem;
+}

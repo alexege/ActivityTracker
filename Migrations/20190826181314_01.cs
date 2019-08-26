@@ -39,17 +39,17 @@ namespace CSharpBelt.Migrations
                     Duration = table.Column<int>(nullable: false),
                     DurationMeasure = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    CoordinatorUserId = table.Column<int>(nullable: true)
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Activities", x => x.ActivityId);
                     table.ForeignKey(
-                        name: "FK_Activities_Users_CoordinatorUserId",
-                        column: x => x.CoordinatorUserId,
+                        name: "FK_Activities_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,9 +80,9 @@ namespace CSharpBelt.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Activities_CoordinatorUserId",
+                name: "IX_Activities_UserId",
                 table: "Activities",
-                column: "CoordinatorUserId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Participants_ActivityId",
